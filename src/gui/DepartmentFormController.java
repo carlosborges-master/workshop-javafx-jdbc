@@ -1,9 +1,13 @@
 package gui;
 
 import java.net.URL;
+import java.net.http.WebSocket.Listener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listener.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
@@ -20,7 +24,10 @@ import model.service.DepartmentService;
 public class DepartmentFormController implements Initializable {
 	
 	private Department entity;
+	
 	private DepartmentService service;
+	
+	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 	
 	@FXML
 	private TextField txtId;
@@ -44,6 +51,10 @@ public class DepartmentFormController implements Initializable {
 		this.service = service;
 	}
 	
+	public void subscribeDataChangeListener(DataChangeListener listener) {
+		dataChangeListeners.add(listener);
+	}
+		
 	
 	@FXML
 	public void onBtSalveAction(ActionEvent event) {
@@ -57,6 +68,7 @@ public class DepartmentFormController implements Initializable {
 		try {
 		entity = getFormDate();
 		service.saveOrUpdate(entity);
+		notifyDataChangeListeners();
 		Utils.currentStage(event).close();
 		
 		}
@@ -65,6 +77,14 @@ public class DepartmentFormController implements Initializable {
 		}
 	}
 	
+	private void notifyDataChangeListeners() {
+
+		for (DataChangeListener listener : dataChangeListeners) {
+			listener.onDataChanged();
+			 
+		}
+		
+	}
 	private Department getFormDate() {
 		Department obj = new Department();
 		
