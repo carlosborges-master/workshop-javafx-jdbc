@@ -93,5 +93,13 @@ public class Utils {
 			}
 		});
 	}
+	
+	public static Double tyParceToDouble(String str) {
+		try {
+			return Double.parseDouble(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
 
 }
